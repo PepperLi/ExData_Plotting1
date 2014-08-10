@@ -12,9 +12,10 @@ x1 <- my_data0[,3]
 # compute the range of x1, which help determine the "breaks"
 # in hist function
 range(x1)
+b <- c(0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8)
 # draw the plot
 png("plot1.png")
-hist(x1,breaks=c(0:8,0.5),freq=TRUE,col="red",
+hist(x1,breaks=b,freq=TRUE,col="red",
      main="Global Active Power",
      xlab = "Global Active Power (kilowatts)")
 dev.off()
