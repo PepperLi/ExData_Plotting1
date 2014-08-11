@@ -11,10 +11,13 @@ datatime <- strptime(paste(Date,Time),format="%Y-%m-%d %H:%M:%S")
 png("plot3.png",width=480,height=480)
 plot(datatime,Sub_metering_1,col="black",type="l",ylab="Energy sub
      metering",xlab=" ")
-lines(datatime,Sub_metering_2,col="red",type"l")
-lines(datatime,Sub_metering_3,col="blue",type"l")
+lines(datatime,Sub_metering_2,col="red")
+lines(datatime,Sub_metering_3,col="blue")
 legend("topright",
        legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),
        col=c("black","red","blue"),
-       lty=1)
+       lty=c(1,1)
+       lwd=c(2.5,2.5),
+       cex=0.75
+)
 graphics.off()
