@@ -20,4 +20,6 @@ legend("topright",
        lwd=c(2.5,2.5),
        cex=0.75
 )
+axis(1,c(datatime[1],mean(datatime),datatime[2880]),labels=c("Thu","Fri","Sat"))
+
 graphics.off()
