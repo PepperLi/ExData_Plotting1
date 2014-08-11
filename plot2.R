@@ -11,6 +11,8 @@ datatime <- strptime(paste(Date,Time),format="%Y-%m-%d %H:%M:%S")
 # draw the plot
 png("plot2.png",width=480,height=480)
 plot(datatime,Global_active_power,type="l",xlab="",ylab="Global Active Power(kw)")
+axis(1,c(datatime[1],mean(datatime),datatime[2880]),labels=c("Thu","Fri","Sat"))
+
 graphics.off()
 
 detach(my_data)
