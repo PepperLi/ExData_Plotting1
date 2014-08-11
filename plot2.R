@@ -1,9 +1,17 @@
 my_data <- read.csv2("my_data.txt")
-my_data0 <- my_data
 
-attach(my_data0)
-# use paste to add Date and Time together
-Date <- as.character(Date)
-Time <- as.character(Time)
-time <- paste(Date,Time,sep="  ")
-time <- strptime(time,"%Y-%m-%d %H:%M:%S")
+attach(my_data)
+
+Global_active_power <- as.numeric(Global_active_power)
+
+# make the Date and Time as a whole
+Date <- as.Date(Date,format="%d/%m/%Y")
+datatime <- strptime(paste(Date,Time),format="%Y-%m-%d %H:%M:%S")
+
+# draw the plot
+png("plot2.png",width=480,height=480)
+plot(datatime,Global_active_power,type="l",xlab="",ylab="Global Active Power(kw)")
+graphics.off()
+
+detach(my_data)
+
