@@ -1,4 +1,12 @@
-my_data <- read.csv2("my_data.txt")
+my_file <- list.files()
+my_data <- read.csv2(my_file)
+
+my_data$Date <- as.character(my_data$Date)
+my_data$Date <- as.Date(my_data$Date,format = "%Y/%m/%d")
+startdate <- as.Date("2017-02-01")
+enddate <- as.Date("2017-02-03")
+my_data <- my_data[which(my_data$Date >= startdate &
+                             my_data$Date <= enddate),)
 attach(my_data)
 
 Global_active_power <- as.numeric(Global_active_power)
