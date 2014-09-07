@@ -1,33 +1,79 @@
-my_file <- list.files()
-my_data <- read.csv2(my_file)
+library(data.table)
+library(parallel)
+library(lubridate)
+######################################################################
+## Loading the data
+dataFN <- fread("household_power_consumption.txt",
+                colClasses="character",skip = 66637, nrows = 2880)
+ColNames <- c("Date", "Time", "Global_active_power" ,
+              "Global_reactive_power", "Voltage", "Global_intensity",
+              "Sub_metering_1", "Sub_metering_2", "Sub_metering_3")
+Consump <- dataFN
+setnames(Consump,ColNames)
+######################################################################
+## Converting the data to easy handle
 
-my_data$Date <- as.character(my_data$Date)
-my_data$Date <- as.Date(my_data$Date,format = "%Y/%m/%d")
-startdate <- as.Date("2017-02-01")
-enddate <- as.Date("2017-02-03")
-my_data <- my_data[which(my_data$Date >= startdate &
-                             my_data$Date <= enddate),)
-attach(my_data)
+## Pasting date and time
+Consump$myDate <- paste(Consump$Date,Consump$Time)
+Consump$myDate <- dmy_hms(Consump$myDate)
+## OR
+Consump$myDate <- striptime(Consump$myDate,"%d/%m/%Y %H:%M:%S")
 
-Global_active_power <- as.numeric(Global_active_power)
+## Change the class of data
+Consump$Global_active_power <-
+    sapply(Consump$Global_active_power, as.numeric)
 
-# make the Date and Time as a whole
-Date <- as.Date(Date,format="%d/%m/%Y")
-datatime <- strptime(paste(Date,Time),format="%Y-%m-%d %H:%M:%S")
+Consump$Global_reactive_power <-
+    sapply(Consump$Global_reactive_power, as.numeric)
 
-# draw the plot
+Consump$Voltage <-
+    sapply(Consump$Voltage, as.numeric)
+
+Consump$Global_intensity <-
+    sapply(Consump$Global_intensity, as.numeric)
+
+Consump$Sub_metering_1 <- sapply(Consump$Sub_metering_1,
+                                 as.numeric)
+
+Consump$Sub_metering_2 <- sapply(Consump$Sub_metering_2,
+                                 as.numeric)
+
+Consump$Sub_metering_3 <- sapply(Consump$Sub_metering_3,
+                                 as.numeric)
+
+######################################################################
+## Plot code:
 png("plot3.png",width=480,height=480)
-plot(datatime,Sub_metering_1,col="black",type="l",ylab="Energy sub
-     metering",xlab=" ")
-lines(datatime,Sub_metering_2,col="red")
-lines(datatime,Sub_metering_3,col="blue")
+
+plot(Consump$myDate, Consump$Sub_metering_1, type = "l",
+     xlab = "", ylab = "Energy sub metering")
+
+axis(1,c(Consump$myDate[1],mean(Consump$myDate),Consump$myDate[2880]),
+     labels=c("Thu","Fri","Sat"))
+
+lines(Consump$myDate, Consump$Sub_metering_2, col="red")
+lines(Consump$myDate, Consump$Sub_metering_3, col="blue")
+
+legendText <- c("Sub_metering_1","Sub_metering_2","Sub_metering_3")
+
 legend("topright",
-       legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"),
-       col=c("black","red","blue"),
-       lty=c(1,1)
-       lwd=c(2.5,2.5),
-       cex=0.75
-)
-axis(1,c(datatime[1],mean(datatime),datatime[2880]),labels=c("Thu","Fri","Sat"))
+       legendText, # puts text in the legend
+       lty = c(1,1), # gives the legend appropriate symbols (lines)
+       lwd = c(2.5, 2.5), col=c("black","red", "blue"), # gives the legend lines
+       # the correct color and width 
+       cex = 0.75)                      # Character expansion factor)
+
 
 graphics.off()
+
+
+
+
+
+
+
+
+
+
+
+
