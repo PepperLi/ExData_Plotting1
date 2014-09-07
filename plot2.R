@@ -1,27 +1,59 @@
-my_file <- list.files()
-my_data <- read.csv2(my_file)
+library(data.table)
+library(parallel)
+library(lubridate)
+######################################################################
+## Loading the data
+dataFN <- fread("household_power_consumption.txt",
+                colClasses="character",skip = 66637, nrows = 2880)
+ColNames <- c("Date", "Time", "Global_active_power" ,
+              "Global_reactive_power", "Voltage", "Global_intensity",
+              "Sub_metering_1", "Sub_metering_2", "Sub_metering_3")
+Consump <- dataFN
+setnames(Consump,ColNames)
+######################################################################
+## Converting the data to easy handle
 
-my_data$Date <- as.character(my_data$Date)
-my_data$Date <- as.Date(my_data$Date,format = "%Y/%m/%d")
-startdate <- as.Date("2017-02-01")
-enddate <- as.Date("2017-02-03")
-my_data <- my_data[which(my_data$Date >= startdate &
-                             my_data$Date <= enddate),)
+## Pasting date and time
+Consump$myDate <- paste(Consump$Date,Consump$Time)
+Consump$myDate <- dmy_hms(Consump$myDate)
+## OR
+Consump$myDate <- striptime(Consump$myDate,"%d/%m/%Y %H:%M:%S")
 
-attach(my_data)
+## Change the class of data
+Consump$Global_active_power <-
+  sapply(Consump$Global_active_power, as.numeric)
 
-Global_active_power <- as.numeric(Global_active_power)
+Consump$Global_reactive_power <-
+  sapply(Consump$Global_reactive_power, as.numeric)
 
-# make the Date and Time as a whole
-Date <- as.Date(Date,format="%d/%m/%Y")
-datatime <- strptime(paste(Date,Time),format="%Y-%m-%d %H:%M:%S")
+Consump$Voltage <-
+  sapply(Consump$Voltage, as.numeric)
 
-# draw the plot
-png("plot2.png",width=480,height=480)
-plot(datatime,Global_active_power,type="l",xlab="",ylab="Global Active Power(kw)")
-axis(1,c(datatime[1],mean(datatime),datatime[2880]),labels=c("Thu","Fri","Sat"))
+Consump$Global_intensity <-
+  sapply(Consump$Global_intensity, as.numeric)
+
+Consump$Sub_metering_1 <- sapply(Consump$Sub_metering_1,
+                                 as.numeric)
+
+Consump$Sub_metering_2 <- sapply(Consump$Sub_metering_2,
+                                 as.numeric)
+
+Consump$Sub_metering_3 <- sapply(Consump$Sub_metering_3,
+                                 as.numeric)
+
+######################################################################
+## Plot code:
+png("plot2.png",width=600,height=480)
+
+plot(Consump$myDate, Consump$Global_active_power,
+     type="l", 
+     ylab = "Global Active Power (kilowatts)", xlab = "",
+     xlim=c(min(Consump$myDate),max(Consump$myDate)))
+
+axis(1,c(Consump$myDate[1],mean(Consump$myDate),Consump$myDate[2880]),
+     labels=c("Thu","Fri","Sat"))
 
 graphics.off()
-
-detach(my_data)
-
+## Or use the ggplot2 package
+library(ggplot2)
+qplot(myDate, Global_active_power, data = Consump, geom = "line")
